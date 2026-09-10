@@ -61,12 +61,14 @@ jobs:
 
       - name: Create GitHub Release
         run: |
-          ziparr=""
+          zip_files=""
           for f in /tmp/zips/*.zip; do
             [ -e "$f" ] || continue
             echo "artifact: $(basename "$f") ($(stat -c%s "$f") bytes)"
-            ziparr="$ziparr -a $(basename "$f")=$f"
+            zip_files="$zip_files $f"
           done
-          gh release create "${GITHUB_REF_NAME}" --title "ReSukiSU ${GITHUB_REF_NAME}" --notes "Auto-built ReSukiSU kernel zips for grandppltedx" $ziparr
+          gh release create "${GITHUB_REF_NAME}" $zip_files \
+            --title "ReSukiSU ${GITHUB_REF_NAME}" \
+            --notes "Auto-built ReSukiSU kernel zips for grandppltedx"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
