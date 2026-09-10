@@ -58,7 +58,13 @@ TC="$CACHE/toolchain/bin/arm-linux-androideabi-"
 if [ ! -x "${TC}gcc" ]; then
   echo "==> fetching GCC 4.9 toolchain"
   mkdir -p "$CACHE/toolchain"
-  curl -fsSL "$TOOLCHAIN_URL" -o "$WORK_DIR/tc.tar.gz"
+  for i in 1 2 3 4 5; do
+    if curl -fsSL --retry 5 --retry-delay 5 "$TOOLCHAIN_URL" -o "$WORK_DIR/tc.tar.gz"; then
+      break
+    fi
+    echo "==> download attempt $i failed, retrying in 15s"
+    sleep 15
+  done
   tar -xzf "$WORK_DIR/tc.tar.gz" -C "$CACHE/toolchain"
 fi
 

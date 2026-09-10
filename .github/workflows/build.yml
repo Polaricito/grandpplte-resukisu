@@ -27,6 +27,12 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
+      - name: Cache GCC 4.9 toolchain
+        uses: actions/cache@v4
+        with:
+          path: /tmp/ksu-cache/toolchain
+          key: gcc49-toolchain-v1
+
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
