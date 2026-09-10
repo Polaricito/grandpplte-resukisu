@@ -1,0 +1,17 @@
+diff --git a/kernel/hook/arm32/patch_memory.c b/kernel/hook/arm32/patch_memory.c
+index cd96d088..21dd67bb 100644
+--- a/kernel/hook/arm32/patch_memory.c
++++ b/kernel/hook/arm32/patch_memory.c
+@@ -44,8 +44,12 @@
+ #define KSU_PUD_TO_PHYS(pud) ((unsigned long)pud_pfn(pud) << PAGE_SHIFT)
+ #endif
+ #ifndef KSU_PMD_TO_PHYS
++#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 8, 0) && !defined(CONFIG_ARM_LPAE)
++#define KSU_PMD_TO_PHYS(pmd) ((unsigned long)(pmd_val(pmd) & SECTION_MASK))
++#else
+ #define KSU_PMD_TO_PHYS(pmd) ((unsigned long)pmd_pfn(pmd) << PAGE_SHIFT)
+ #endif
++#endif
+ #ifndef KSU_PTE_TO_PHYS
+ #define KSU_PTE_TO_PHYS(pte) ((unsigned long)pte_pfn(pte) << PAGE_SHIFT)
+ #endif

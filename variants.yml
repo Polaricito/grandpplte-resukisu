@@ -1,0 +1,27 @@
+# Kernel source variants. Each maps to an almondnguyen/android_kernel_samsung_grandppltedx ref
+# (branch name or commit SHA) plus the defconfig used to build it.
+#
+# ref = "d98f4624a4f" pins a specific commit. Use commit SHAs for
+# reproducible/proven builds, branch names to track the latest upstream.
+variants:
+  - name: los14
+    ref: cm-14.1
+    defconfig: mt6737t-grandpplte_defconfig
+  - name: los14-gadget
+    ref: cm-14.1_3.18-gadget
+    defconfig: mt6737t-grandpplte_defconfig
+  - name: los15.1
+    ref: lineage-15.1
+    defconfig: mt6737t-grandpplte_defconfig
+  - name: los15.1-romera
+    ref: d98f4624a4f
+    defconfig: mt6737t-grandpplte_defconfig
+  - name: los16
+    ref: lineage-16.0-treble
+    defconfig: mt6737t-grandpplte_defconfig
+  - name: los18
+    ref: lineage-18.1
+    defconfig: mt6737t-grandpplte_defconfig
+  - name: stable
+    ref: stable-old
+    defconfig: mt6737t-grandpplte_defconfig

@@ -1,0 +1,66 @@
+name: Build kernel variants
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - los14
+          - los14-gadget
+          - los15.1
+          - los15.1-romera
+          - los16
+          - los18
+          - stable
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bc bison flex libssl-dev libncurses-dev make gcc python3 curl git file unzip zip cpio rsync
+
+      - name: Build ${{ matrix.variant }}
+        run: ./build.sh ${{ matrix.variant }}
+
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: zip-${{ matrix.variant }}
+          path: dist/${{ matrix.variant }}-AnyKernel3.zip
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all zips
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/zips
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        run: |
+          ziparr=""
+          for f in /tmp/zips/*.zip; do
+            [ -e "$f" ] || continue
+            echo "artifact: $(basename "$f") ($(stat -c%s "$f") bytes)"
+            ziparr="$ziparr -a $(basename "$f")=$f"
+          done
+          gh release create "${GITHUB_REF_NAME}" --title "ReSukiSU ${GITHUB_REF_NAME}" --notes "Auto-built ReSukiSU kernel zips for grandppltedx" $ziparr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
